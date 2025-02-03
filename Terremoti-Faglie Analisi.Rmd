@@ -1,0 +1,42 @@
+---
+title: "Analisi dei Terremoti e delle faglie nel mondo (1970-2025)"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+date: ""
+---
+# Introduzione
+In questo lavoro di gruppo, abbiamo deciso di analizzare un dataset preso [USGS.gov](https://earthquake.usgs.gov/earthquakes/search/), che contiene varie informazioni sui 
+terremoti avvenuti in tutti il mondo dal 1970 al 2025. Il dataset è stato selezionato in modo da avere  solo terremoti di magnitudo superiore a 5.0 della scala Richter. Ci siamo limitati a questa magnitudo in quanto il sito consente di scaricare fino a 20.000 eventi la volta, quindi per coprire tutta la serie storica è stato necessario unificare tutte le richieste creando un unico dataset con 87798. Inoltre, dal sito [globalquakemodel.org](https://www.globalquakemodel.org/) il quale contiene la mappa di tutte le faglie attive nel mondo. In questo modo abbiamo potuto confrontare le posizioni dei terremoti rispetto alle faglie. I dati sono stati analizzati tenendo conto sia della loro posizione geografica e di altre caratteristiche presenti nel dataset e  sia della loro frequenza nel corso del tempo. Queste analisi sono state effettuate sia attraverso l'utilizzo di mappe, sia attraverso l'utilizzo di grafici al fine di descrivere al meglio tutte le variabili quantitative e qualitative presenti.
+
+## Dataset Faglie
+Il dataset contiene la mappa di tutte le faglie attive presenti nel mondo, ed è possibile importarlo tramite il seguente codice:
+```{r echo=FALSE}
+library(readr)
+library(sf)
+library(ggplot2)
+library(dplyr)
+library(maps)
+library(tidyr)
+library(RColorBrewer)
+library(stringr)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggrepel)
+library(lubridate)
+faglie <- st_read("gem_active_faults.shp")
+ggplot() +
+  # Aggiungi la mappa del mondo
+  borders("world", colour = "gray50", fill = "lightgray") + 
+  # Aggiungi le faglie
+  geom_sf(data = faglie, color = "red", size = 1, alpha = 0.7) +
+  labs(title = "Faglie Geologiche Attive", x = "Longitudine", y = "Latitudine", color = "Magnitudo") +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    legend.position="right")
+```
+
+
