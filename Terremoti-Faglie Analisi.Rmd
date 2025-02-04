@@ -12,7 +12,7 @@ terremoti avvenuti in tutti il mondo dal 1970 al 2025. Il dataset è stato selez
 
 ## Dataset Faglie
 Il dataset contiene la mappa di tutte le faglie attive presenti nel mondo, ed è possibile importarlo tramite il seguente codice:
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE}
 library(readr)
 library(sf)
 library(ggplot2)
@@ -25,6 +25,9 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(ggrepel)
 library(lubridate)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, error=FALSE}
 faglie <- st_read("gem_active_faults.shp")
 ggplot() +
   # Aggiungi la mappa del mondo
