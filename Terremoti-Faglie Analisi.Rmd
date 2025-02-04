@@ -12,7 +12,7 @@ terremoti avvenuti in tutti il mondo dal 1970 al 2025. Il dataset è stato selez
 
 ## Dataset Faglie
 Il dataset contiene la mappa di tutte le faglie attive presenti nel mondo, ed è possibile importarlo tramite il seguente codice:
-```{r echo=FALSE, message=FALSE}
+```{r echo=TRUE, message=FALSE}
 library(readr)
 library(sf)
 library(ggplot2)
@@ -26,7 +26,7 @@ library(rnaturalearthdata)
 library(ggrepel)
 library(lubridate)
 ```
-
+Per semplicità si è deciso di presentare tutte le librerie utilizzate nel lavoro nel precedente blocco di codice.
 ```{r echo=TRUE, message=FALSE, warning=FALSE, error=FALSE}
 faglie <- st_read("gem_active_faults.shp")
 ggplot() +
@@ -34,12 +34,54 @@ ggplot() +
   borders("world", colour = "gray50", fill = "lightgray") + 
   # Aggiungi le faglie
   geom_sf(data = faglie, color = "red", size = 1, alpha = 0.7) +
-  labs(title = "Faglie Geologiche Attive", x = "Longitudine", y = "Latitudine", color = "Magnitudo") +
+  labs(title = "Faglie Geologiche Attive", x = "Longitudine", y = "Latitudine", 
+           color = "Magnitudo") +
   theme_minimal(base_size = 14) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
     legend.position="right")
 ```
+Nel grafico, viene mostrata la mappa nel mondo in grigio, e in rosso, le faglie geologiche attive. Come si può vedere le faglie si distribuiscono principalemente lungo i confini delle placche tettoniche con una forte concentrazione nella parte sud-ovest dell'Asia a formare la catena dell' Himalaya. 
+La presenza di faglie geologiche è di particolare interesse in quanto nei pressi di queste zone si osserva una maggiore probabilità che vi siano terremoti. Questo fenomeno verrà visualizzato in seguito, attraverso il dataset "Earthquake" in cui è presente la lista dei terremoti registrati dal 1970-2025.
+
+## Dataset Earthquake: 
+
+I dati sono stati presi dal sito [USGS.gov](https://earthquake.usgs.gov/earthquakes/search/) filtrati con una magnitudo superiore a 5.0. Essendo la frequenza dei terremoti correlata alla magnitudo il sito consentiva solo di scaricare 20000 eventi per volta, producendo troppe richieste di dati all'ente fornitore. Inoltre, il dataset sull'intero fenomeno era piuttosto frammentato si è deciso quindi di unire le informazioni distribuite su diversi anni in un unico blocco per avere una visione globale del fenomeno. 
+
+In R, i dati sono stati importati tramite il seguente codice:
+```{r echo=TRUE}
+terremoti <- read.csv("Earthquake_1970-2025.csv")
+
+```
+
+
+## Analisi Premilinare.
+
+Il nostro dataset è composto da 22 variabili di varia natura per un totale di quasi 88000 osservazioni. Per semplicità, mostriamo un breve estratto delle variabili piu significative usate nell'analisi del fenomeno.
+
+
+```{r echo=TRUE}
+library(pander)
+pander(head(terremoti %>% select(latitude, longitude, depth, mag, nst, type, time)))
+
+```
+Nella seguente tabella, le variabili indicano: 
+
+-  __latitudine e longitudine__: rappresentano le coordinate geografiche di dove è avvenuto il terremoto.
+-  __depth__: La profondità, misurata in km rispetto alla superficie terrestre.
+- __mag__: la magnitudo del terremoto in scala Richter.
+- __nst__: numero di stazioni che hanno registrato il terremoto. 
+- __type__: l'origine del terremoto inteso come causa scatenante. (Terremoto terrestre, esplosione nucleare,                   collasso di miniere, frane ed esplosioni.)
+- __time__:  data e ora della rilevazione del fenomeno.
+
+Con la funzione summary mostriamo le caratteristiche delle variabili quantitative mensionate sopra.
+```{r echo=TRUE}
+pander(summary(terremoti %>% select(latitude, longitude)))
+pander(summary(terremoti %>% select(depth, mag, nst)))
+```
+Ciò che è possibile notare è che per la variabile nst ci sono diversi dati mancanti (NA). Per la variabile depth, si può notare che la mediana e la media non coincidono, lasciando intendere in questa prima fase, la presenza di asimmetria nei dati. Maggiori conferme si hanno guardando la differenza tra il terzo quartile(3rd Qu) e il massimo(Max). Il terzo quartile della variabile mag, ci suggerisce che il 75% dei dati non supera il 5.5 di magnitudo. 
+
+
 
 
