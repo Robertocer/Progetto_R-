@@ -83,5 +83,51 @@ pander(summary(terremoti %>% select(depth, mag, nst)))
 Ciò che è possibile notare è che per la variabile nst ci sono diversi dati mancanti (NA). Per la variabile depth, si può notare che la mediana e la media non coincidono, lasciando intendere in questa prima fase, la presenza di asimmetria nei dati. Maggiori conferme si hanno guardando la differenza tra il terzo quartile(3rd Qu) e il massimo(Max). Il terzo quartile della variabile mag, ci suggerisce che il 75% dei dati non supera il 5.5 di magnitudo. 
 
 
+## Analisi Quantitativa
+Come prima analisi, ci siamo concentrati sulle variabili quantitative cercando possibili correlazioni fra di esse. A tal fine abbiamo utilizzando la funzione "cor" del pacchetto stats, che di default utilizza il coefficiente di correlazione di Pearson. Per una maggiore interpetazione del valore dei coefficienti, si è deciso di utilizzare una heat map generata tramite il seguente codice. 
+
+```{r echo=TRUE}
+library(dplyr)
+library(tidyr)
+library(corrplot)
+library(ggcorrplot)
+##seleziono le variabili per l'analisi
+df_corr= terremoti%>%
+        dplyr::select(depth, mag, nst, gap, dmin, rms, horizontalError, depthError, 
+                      magError, magNst)
+df_na=df_corr %>%
+        summarise(across(c(depth, mag, nst, gap, dmin, rms, horizontalError, 
+                          depthError, magError, magNst), 
+                   ~sum(is.na(.)))) 
+
+#### seleziono le variabili da pulire da NA
+df_corr_clean <- df_corr %>%
+  drop_na(depth, mag, nst, gap, dmin, rms, horizontalError, 
+            depthError, magError, magNst)      
+
+#calcolo la matrice di correlazione
+df_f=cor(df_corr_clean)
+
+
+library(corrplot)
+
+corrplot(df_f, 
+         method = "color",    
+         type = "full",      
+         tl.cex = 0.8,        
+         tl.srt = 45,         
+         addCoef.col = "black",  
+         number.cex = 0.7)    
+```
+
+Dalla heat map, si evince vi siano numerose correlazioni fra le variabili di cui, risultano di particolare interesse le seguenti: 
+
+- __Mag e nst__: Queste due variabili appartengono rispettivamente al livello di magnitudo  e al numero di stazioni sismiche che hanno registrato il terremoto. Sono                   correlate positivamente in quanto un evento con alta magnitudo sarà rilevato da piu stazioni sismiche presenti nel mondo.
+- __nst e gap__: Con un maggior numero di stazioni (nst elevato), la copertura attorno all'epicentro è più uniforme, riducendo il gap.
+Al contrario, con meno stazioni la copertura è più concentrata, generando un gap più ampio.
+- __Mag Error e magNst__:  Queste due variabili appartengono rispettivamente al livello di magnitudo  e al numero di stazioni sismiche che hanno partecipato alla determinazione della magnitudo. Per questo motivo osserviamo un coefficiente di correlazione negativo. 
+- __Horizontal Error e dmin__:L'errore orizzontale potrebbe essere correlato alla distanza minima (dmin) perché terremoti più lontani dalla rete di rilevamento (maggiore dmin) tendono ad avere una localizzazione meno precisa, aumentando l'errore orizzontale. Questo è dovuto alla geometria della rete sismica e alla riduzione della precisione con la distanza.
+- __Horizontal Error e depth error__: L'errore orizzontale e l'errore di profondità sono spesso correlati perché entrambi dipendono dalla qualità e dalla distribuzione dei dati sismici. Una scarsa copertura strumentale o una geometria sfavorevole possono influenzare simultaneamente la precisione della localizzazione sia in orizzontale che in profondità.
+
 
 
