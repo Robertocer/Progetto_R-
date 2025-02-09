@@ -1,13 +1,14 @@
 
-rm(list = ls())
 
+library(rworldmap)
+library(sp)
 ##############################
 ##############################
 #### CARICAMENTO FUNZIONI ####
 ##############################
 ##############################
 
-source(file.choose())
+#source(file.choose())
 
 ###########################
 ###########################
@@ -42,7 +43,7 @@ source(file.choose())
 #   - locationSource: network che ha originariamente creato il luogo segnalato dell'evento
 #   - magSource: network che ha originariamente creato la magnitudo segnalata dell'evento
 
-db = read.table(file.choose(), header=T, sep=",", dec=".")
+#db = read.table(file.choose(), header=T, sep=",", dec=".")
 #attach(db)
 
 ################################
@@ -394,8 +395,8 @@ ggplot(db_analysis, aes(x=droplevels(continent), y=mag)) +
 #### Boxplot + Violin plot ####
 ggplot(db_analysis, aes(x=droplevels(continent), y=mag)) +
   geom_violin(fill="lightblue", color="darkblue") +
-  geom_boxplot(width=0.15, size=0.8, fill="orange",
-               outlier.color="orange", outlier.size=2, outlier.shape=1) +
+  geom_boxplot(width=0.15, size=0.8, fill="red",
+               outlier.color="red", outlier.size=2, outlier.shape=1) +
   theme_minimal() +
   labs(title="BOXPLOT + VIOLIN PLOT di magnitudo per continente",
        x="Continente", 
@@ -509,7 +510,7 @@ ggplot(db_analysis, aes(x=depth, y=mag)) +
 
 ggplot(db_analysis, aes(x=dmin, y=horizontalError)) +
   geom_point(color="lightblue", alpha=0.8, size=2) +
-  geom_smooth(method="lm", se=F, color="cornflowerblue") +
+  geom_smooth(se=F, color="cornflowerblue") +
   scale_y_continuous(limits=c(0,20)) +
   scale_x_continuous(breaks=seq(0,23,5), limits=c(0,23)) +
   theme_minimal() +
