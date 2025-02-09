@@ -158,7 +158,7 @@ ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
 
 
 ```{r echo=TRUE}
-DS3_filtered <- terremoti%>%
+DS3_filtered <-terremoti %>%
   filter(depth < 300) %>%  # Escludiamo solo outlier estremi
   mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), include.lowest = TRUE))
 
@@ -180,7 +180,7 @@ ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
 
 ```
 
-Dall'esame dei grafici soprastanti, si evince che la distribuzione della densità per le varie fasce di magnitudo risulta molto simile; in altre parole la distribuzione della densità non varia significativamente per le varie fasce di magnitudo. Sembrerebbe pertanto che profondità e magnitudo non abbiano una relazione così stretta come in realtà ci saremmo aspettati.
+
 
 
 
@@ -242,36 +242,9 @@ Al contrario, con meno stazioni la copertura è più concentrata, generando un g
 
 
 
+Dalla matrice di correlazione si evince un legame positivo fra la variabile dmin e HorizontalError pari a 0.30. A tal proposito abbiamo deciso di approfondire questo legame mediante la rappresentazione dello scatterplot. Abbiamo deciso di confrontare un modello lineare con un modello gam, che è il modello che si adatta meglio ai dati. Questo perchè evidentemente la relazione fra la distanza dalla stazione vicina rispetto all'errore non è lineare.
 
 
-
-
-```{r echo=TRUE}
-library(dplyr)
-library(ggplot2)
-
-# Filtra i dati e crea le fasce di magnitudo
-DS3_filtered <- terremoti %>%
-  filter(depth > 0) %>%  # Rimuove profondità negative o zero
-  mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), include.lowest = TRUE)) %>%
-  filter(!is.na(mag_group)) %>%  # Rimuove fasce di magnitudo senza dati
-  group_by(mag_group) %>%
-  filter(n() >= 10) %>%  # Mantiene solo gruppi con almeno 10 osservazioni
-  ungroup()
-
-# Creiamo il violin plot
-custom_colors <- c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD", "#8C564B", "#E377C2", "#7F7F7F")
-
-ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
-  geom_violin(scale = "width", alpha = 0.7, color = "black") +  # Bordo nero
-  scale_fill_manual(values = custom_colors) +  # Usa la palette personalizzata
-  labs(title = "Distribuzione della profondità per fasce di magnitudo",
-       x = "Fasce di Magnitudo",
-       y = "Profondità (km)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
-
-```
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(ggplot2)
@@ -298,11 +271,5 @@ ggplot(terremoti, aes(x = dmin, y = horizontalError)) +
 
  
 ```
-
-Dalla matrice di correlazione si evince un legame positivo fra la variabile dmin e HorizontalError pari a 0.30. A tal proposito abbiamo deciso di approfondire questo legame mediante la rappresentazione dello scatterplot. Abbiamo deciso di confrontare un modello lineare con un modello gam, che è il modello che si adatta meglio ai dati. Questo perchè evidentemente la relazione fra la distanza dalla stazione vicina rispetto all'errore non è lineare.
-
-
-
-
  
 
