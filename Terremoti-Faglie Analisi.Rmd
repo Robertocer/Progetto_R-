@@ -72,7 +72,7 @@ Nella seguente tabella, le variabili indicano:
 -  __depth__: La profondità, misurata in km rispetto alla superficie terrestre.
 - __mag__: la magnitudo del terremoto in scala Richter.
 - __nst__: numero di stazioni che hanno registrato il terremoto. 
-- __type__: l'origine del terremoto inteso come causa scatenante. (Terremoto terrestre, esplosione nucleare,                   collasso di miniere, frane ed esplosioni.)
+- __type__: l'origine del terremoto inteso come causa scatenante. (Terremoto terrestre, esplosione nucleare, collasso di miniere, frane ed esplosioni.)
 - __time__:  data e ora della rilevazione del fenomeno.
 
 Con la funzione summary mostriamo le caratteristiche delle variabili quantitative mensionate sopra.
@@ -157,6 +157,8 @@ ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
 ```
 
 
+
+
 ```{r echo=TRUE}
 DS3_filtered <-terremoti %>%
   filter(depth < 300) %>%  # Escludiamo solo outlier estremi
@@ -181,14 +183,7 @@ ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
 ```
 
 
-
-
-
-
-
-
-
-
+La maggior parte dei terremoti si verifica a profondità superficiali (tra 0-70 km) come evidenziato dalla posizione del box e dalla mediana. Questo riflette la natura della tettonica delle placche, dove l’attività sismica è più frequente lungo i margini delle placche. Tuttavia sono presenti anche outliers a grandi profondità. I terremoti tra 200-300 km sono rari ma presenti. 
 
 
 
@@ -272,4 +267,57 @@ ggplot(terremoti, aes(x = dmin, y = horizontalError)) +
  
 ```
  
+ 
+ 
+Per concludere l'analisi abbiamo deciso di analizzare l'evoluzione del numero di terremoti avvenuti a livello globale 
+nel periodo di riferimento (1970-2025).
+ 
+ 
+ 
+ 
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+gg=   terremoti %>%
+      mutate(Anno=year(as.Date(time)))%>%
+      group_by(Anno) %>%
+      summarise(Conteggio= n(), magnitudomedia=mean(mag))
 
+ggplot(gg, aes(x = Anno, y = Conteggio)) +
+       geom_line(color = "blue") +
+  labs(title = "Serie Temporale dei Terremoti (Raggruppati per Anno)", x = "Anno", y = "Numero di Terremoti")
+
+```
+
+
+La serie storica, evidenzia come il numero di terremoti sia contenuto in un intervallo tra 1500-2000 terremoti l'anno.
+Tuttavia, nel periodo compreso tra il 2005 e 2010 c'è stato un incremento siginificativo del numero di terremoti, raggiungendo un picco pari a 2500 terremoti nel 2010.
+
+
+
+
+
+
+Avendo informazioni relative alla latitudine e alla longitudine c'è sembrato interessante anche studiare questo fenomeno in base al continente dove  è avvenuto. L'idea è cercare di capire in quale dei continenti il fenomeno risulta particolarmente concentrato. A tal fine mediante il codice che riportiamo di seguito abbiamo collegato il continente e lo stato alle osservazioni del database a disposizione. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+coordinates_continent = function(points)
+{  
+  countriesSP <- getMap(resolution='high')
+  
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
+   
+  indices = over(pointsSP, countriesSP)
+    indices$REGION   
+}
+ 
+coordinates_country = function(points)
+{  
+  countriesSP <- getMap(resolution='high')
+    pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
+   
+  indices = over(pointsSP, countriesSP)
+  
+  indices$ADMIN 
+   
+}
+
+```
