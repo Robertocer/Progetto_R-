@@ -214,16 +214,30 @@ df_corr_clean <- df_corr %>%
 #calcolo la matrice di correlazione
 df_f=cor(df_corr_clean)
 
+ggcorrplot(df_f, 
+           hc.order = TRUE, 
+           type = "lower",
+           lab = TRUE)
 
 library(corrplot)
 
 corrplot(df_f, 
-         method = "color",    
-         type = "full",      
+         method = "color",
+         type = "lower",      
          tl.cex = 0.8,        
          tl.srt = 45,         
          addCoef.col = "black",  
-         number.cex = 0.7)    
+         number.cex = 0.7)
+
+library(GGally)
+df_t = terremoti %>%
+        dplyr::select(depth, mag, nst, gap, dmin, rms) %>%
+        drop_na(depth, mag, nst, gap, dmin, rms) 
+ggpairs(df_t,
+lower=list(continuous = my_scatter),
+diag = list(continuous = my_density)) +
+labs(title = "Mammal size and sleep characteristics") +
+theme_bw()
 ```
 
 Dal correlation plot si evince che le correlazioni fra le variabili di maggiore interesse sono le seguenti: 
