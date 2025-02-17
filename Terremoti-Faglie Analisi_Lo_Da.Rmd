@@ -70,7 +70,8 @@ Il nostro dataset è composto da 22 variabili di varia natura.Per semplicità, m
 
 ```{r echo=TRUE}
 library(pander)
-pander(head(terremoti %>% select(latitude, longitude, depth, mag, nst, type, time)))
+pander(head(terremoti %>% 
+              select(latitude, longitude, depth, mag, nst, type, time)))
 
 ```
 Nella seguente tabella, le variabili indicano: 
@@ -136,14 +137,17 @@ Esaminando le variabili presenti nel dataset e la loro descrizione abbiamo riten
 # Filtra i dati e crea le fasce di magnitudo
 DS3_filtered <- terremoti %>%
   filter(depth > 0) %>%  # Rimuove profondità negative o zero
-  mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), include.lowest = TRUE)) %>%
+  mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), 
+                         include.lowest = TRUE)) %>%
   filter(!is.na(mag_group)) %>%  # Rimuove fasce di magnitudo senza dati
   group_by(mag_group) %>%
   filter(n() >= 10) %>%  # Mantiene solo gruppi con almeno 10 osservazioni
   ungroup()
 
 # Creiamo il violin plot
-custom_colors <- c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD", "#8C564B", "#E377C2", "#7F7F7F")
+custom_colors <- c("#1F77B4", "#FF7F0E", "#2CA02C", 
+                   "#D62728", "#9467BD", "#8C564B", 
+                   "#E377C2", "#7F7F7F")
 
 ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
   geom_violin(scale = "width", alpha = 0.7, color = "black") +  # Bordo nero
@@ -160,7 +164,8 @@ ggplot(DS3_filtered, aes(x = mag_group, y = depth, fill = mag_group)) +
 ```{r echo=TRUE}
 DS3_filtered <-terremoti %>%
   filter(depth < 300) %>%  # Escludiamo solo outlier estremi
-  mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), include.lowest = TRUE))
+  mutate(mag_group = cut(mag, breaks = seq(5, 9, by = 0.5), 
+                         include.lowest = TRUE))
 
 # Rimuovi le fasce di magnitudo che non contengono dati
 DS3_filtered <- DS3_filtered %>%
@@ -216,14 +221,15 @@ Al contrario, con meno stazioni la copertura è più concentrata, generando un g
 - __Horizontal Error e dmin__:L'errore orizzontale potrebbe essere correlato alla distanza minima (dmin) perché terremoti più lontani dalla rete di rilevamento (maggiore dmin) tendono ad avere una localizzazione meno precisa, aumentando l'errore orizzontale. Questo è dovuto alla geometria della rete sismica e alla riduzione della precisione con la distanza.
 - __Horizontal Error e depth error__: L'errore orizzontale e l'errore di profondità sono spesso correlati perché entrambi dipendono dalla qualità e dalla distribuzione dei dati sismici. Una scarsa copertura strumentale o una geometria sfavorevole possono influenzare simultaneamente la precisione della localizzazione sia in orizzontale che in profondità.
 
-Tra le varie relazioni evidenziate sopra abbiamo deciso di concentrare l'attenzione sul legame tra le variabili dmin (distanza dalla stazione più vicina) e HorizontalError (errore sul rilevamento della posizione), che presentano una correlazione positiva pari a 0.30, come mostrato nel correlation plot. Pertanto al fine di approfondire questa relazione abbiamo deciso di rappresentare lo scatterplot delle due variabili e di confrontare l'adattamento di un modello lineare rispetto ad un modello GAM (Generalized Additive Model), il quale è il modello che si adatta meglio ai dati. In conclusione, pertanto, possiamo dire che la relazione tra queste due variabili risulta non lineare.
+
+Attraerso il segguente grafico possiamo dare una migliore interpetazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot unito ad con fit di un modello lineare.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-##seleziono le variabili per l'analisi
+# seleziono le variabili per l'analisi
 df_corr= terremoti%>%
         dplyr::select(depth, mag, nst, gap, dmin, rms)
 
-#### seleziono le variabili da pulire da NA
+# seleziono le variabili da pulire da NA
 df_corr_clean <- df_corr %>%
   drop_na(depth, mag, nst, gap, dmin, rms)      
 
@@ -242,15 +248,16 @@ geom_smooth(method=lm,
 se=FALSE, ...)
 }
 
-ggpairs(df_corr_clean,
-lower=list(continuous = my_scatter),
-diag = list(continuous = my_density)) +
-labs(title = "") +
+ggpairs(df_corr_clean, 
+        lower=list(continuous = my_scatter), 
+        diag = list(continuous = my_density)) +
+labs(title = "Matrice di correlazione tra le variabili") +
 theme_bw()
 
-```
-Nel grafico mostrato sopra possiamo dare una migliore interpetazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot unito ad con  fit di un modello lineare.
 
+```
+
+Tra le varie relazioni evidenziate sopra abbiamo deciso di concentrare l'attenzione sul legame tra le variabili dmin (distanza dalla stazione più vicina) e HorizontalError (errore sul rilevamento della posizione), che presentano una correlazione positiva pari a 0.30, come mostrato nel primo correlation plot. Pertanto al fine di approfondire questa relazione abbiamo deciso di rappresentare lo scatterplot delle due variabili e di confrontare l'adattamento di un modello lineare rispetto ad un modello GAM (Generalized Additive Model), il quale è il modello che si adatta meglio ai dati. In conclusione, pertanto, possiamo dire che la relazione tra queste due variabili risulta non lineare.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -266,7 +273,8 @@ ggplot(terremoti, aes(x = dmin, y = horizontalError)) +
   scale_x_continuous(breaks = seq(0, 23, 5), limits = c(0, 23)) +
   theme_minimal() +
   labs(
-    title = "Distanza dalla stazione più vicina vs Errore sul rilevamento della posizione",
+    title = "Distanza dalla stazione più vicina vs Errore 
+    sul rilevamento della posizione",
     subtitle = "Modello Lineare vs Modello GAM",
     x = "Distanza dalla stazione",
     y = "Errore posizione"
@@ -287,12 +295,16 @@ gg=   terremoti %>%
 ggplot(gg, aes(x = Anno, y = Conteggio)) +
        geom_line(color = "blue") +
       theme_minimal()+
-  labs(title = "Serie Temporale dei Terremoti (Raggruppati per Anno)", x = "Anno", y = "Numero di Terremoti")
+  labs(title = "Serie Temporale dei Terremoti (Raggruppati per Anno)", 
+       x = "Anno", y = "Numero di Terremoti")
 
 ```
+La serie storica annuale evidenzia come il numero di terremoti sia contenuto nell'intervallo tra 1500-2000 terremoti per la maggior parte degli anni studiati. Tuttavia, nel periodo compreso tra il 2005 e il 2010 c'è stato un incremento siginificativo del numero di terremoti, raggiungendo il picco, superiore a 2500 terremoti, nel 2010.
 
+
+Nel grafico sottostante, viene riproposta la serie storica dei valori, con una differenza rispetto alla versione precedente: i valori di magnitudine sono stati suddivisi in intervalli di 0.5. Per ciascun intervallo, è stato conteggiato il numero di terremoti per ogni anno. Al fine di migliorare la visibilità dei gruppi con magnitudine inferiore, è stata applicata una scala logaritmica sull'asse delle ordinate.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-# Carica le librerie necessarie
+
 df_year <- terremoti %>%
   mutate(time = ymd_hms(time, tz = "UTC"),
          year = floor_date(time, unit = "year"),
@@ -313,44 +325,10 @@ ggplot(df_year, aes(x = year, y = count, fill = mag_bin)) +
        subtitle = "Aggregazione annuale con step di 0.5 nella magnitudo",
        x = "Anno",
        y = "Numero di Terremoti (scala log.)",
-       fill = "Magnitudo (intervallo)") +
+       fill = "Mag. Gruop") +
   theme_minimal()
 
 ```
-La serie storica annuale evidenzia come il numero di terremoti sia contenuto nell'intervallo tra 1500-2000 terremoti per la maggior parte degli anni studiati. Tuttavia, nel periodo compreso tra il 2005 e il 2010 c'è stato un incremento siginificativo del numero di terremoti, raggiungendo il picco, superiore a 2500 terremoti, nel 2010. 
-
-```{r echo=TRUE, message=FALSE, warning=FALSE}
-# Carica le librerie necessarie
-df_year <- terremoti %>%
-  mutate(time = ymd_hms(time, tz = "UTC"),
-         year = floor_date(time, unit = "year"),
-         mag_bin = cut(mag,
-                       breaks = seq(floor(min(mag, na.rm = TRUE)),
-                                    ceiling(max(mag, na.rm = TRUE)),
-                                    by = 0.5),
-                       include.lowest = TRUE,
-                       right = FALSE)) %>%
-  group_by(year, mag_bin) %>%
-  summarise(count = n(), .groups = "drop")
- 
-# Creazione del grafico ad area
-ggplot(df_year, aes(x = year, y = count, fill = mag_bin)) +
-  geom_area(color = "black", size = 0.2) +
-  scale_y_log10() +
-  labs(title = "Terremoti per Intervallo di Magnitudo nel Tempo",
-       subtitle = "Aggregazione annuale con step di 0.5 nella magnitudo",
-       x = "Anno",
-       y = "Numero di Terremoti (scala log.)",
-       fill = "Magnitudo (intervallo)") +
-  theme_minimal()
- 
-```
-
-
-
-
-
-
 
 Avendo informazioni relative alla latitudine e alla longitudine c'è sembrato interessante anche studiare questo fenomeno in base al continente dove è avvenuto, con l'idea di cercare di capire in quali continenti il fenomeno risulta particolarmente concentrato. A tal fine mediante il codice che riportiamo di seguito abbiamo prima collegato il continente e lo stato alle osservazioni del database oggetto di studio, e successivamente lo abbiamo filtrato andando a considerare soltanto una parte delle osservazioni contenute in esso. Questo perché a causa di una diversa approssimazione di latitudine e longitudine per alcune osservazioni il collegamento con lo stato e il continente non risultava particolarmente preciso.
 
@@ -361,7 +339,7 @@ library(rworldmap)
 coordinates_continent = function(points)
 {  
   countriesSP <- getMap(resolution='high')
-  pointsSP = SpatialPoints(points,                                          proj4string=CRS(proj4string(countriesSP)))  
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
   indices = over(pointsSP, countriesSP)
   indices$REGION   
 }
@@ -369,20 +347,29 @@ coordinates_continent = function(points)
 coordinates_country = function(points)
 {  
   countriesSP <- getMap(resolution='high')
-  pointsSP = SpatialPoints(points,                                          proj4string=CRS(proj4string(countriesSP)))  
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
   indices = over(pointsSP, countriesSP)
   indices$ADMIN 
 }
 
 terremoti2 = terremoti
 
-terremoti2$continent = coordinates_continent(data.frame(as.integer(terremoti$longitude),as.integer(terremoti$latitude)))
+terremoti2$continent = coordinates_continent(data.frame(
+  as.integer(terremoti$longitude),
+  as.integer(terremoti$latitude)))
 
-terremoti2$continent = recode(terremoti2$continent,"South America and the Caribbean"="South America")
+terremoti2$continent = recode(
+  terremoti2$continent,
+  "South America and the Caribbean"="South America")
 
-terremoti2$country = coordinates_country(data.frame(as.integer(terremoti$longitude),as.integer(terremoti$latitude)))
+terremoti2$country = coordinates_country(data.frame(
+  as.integer(terremoti$longitude),
+  as.integer(terremoti$latitude)))
 
-terremoti2 = filter(terremoti2, type=="earthquake" & continent!="<NA>" & continent!="Antarctica")
+terremoti2 = filter(terremoti2, 
+                    type=="earthquake" & 
+                      continent!="<NA>" & 
+                      continent!="Antarctica")
 
 ```
 
@@ -435,8 +422,9 @@ ridge_1 = ggplot(terremoti2, aes(x=mag, y=continent, fill=continent)) +
                  y="Continente")
 
 data_ridge_2a = terremoti2 %>% filter(continent=="South America")
-tab_ridge_2 = data.frame(table(droplevels(data_ridge_2a$country))) %>% filter(Freq>=30) %>%
-                                                                      rename(country=Var1)
+tab_ridge_2 = data.frame(table(droplevels(data_ridge_2a$country))) %>% 
+  filter(Freq>=30) %>%
+  rename(country=Var1)
 data_ridge_2b = inner_join(data_ridge_2a, tab_ridge_2, by="country")
 
 ridge_2 = ggplot(data_ridge_2b, aes(x=mag, y=country, fill=country)) +
@@ -465,7 +453,8 @@ data_cleveland = terremoti2 %>% group_by(continent) %>%
 cleveland_1 = ggplot(data_cleveland, aes(x=max, y=reorder(continent,max))) +
                 geom_point(color="darkblue", size = 2.5) +
                 geom_segment(aes(x=min(terremoti2$mag), xend=max,
-                                 y=reorder(continent,max), yend=reorder(continent,max)),
+                                 y=reorder(continent,max), 
+                                 yend=reorder(continent,max)),
                                  color="lightblue") +
                 theme_minimal() + 
                 theme(panel.grid.major=element_blank(),
@@ -478,13 +467,15 @@ cleveland_1 = ggplot(data_cleveland, aes(x=max, y=reorder(continent,max))) +
 data_cleveland_2a = terremoti2 %>% filter(continent=="South America")
 tab_cleveland_2 = data.frame(table(droplevels(data_cleveland_2a$country))) %>%
                       filter(Freq>=30) %>% rename(country=Var1)
-data_cleveland_2b = inner_join(data_cleveland_2a, tab_cleveland_2, by="country") %>%
+data_cleveland_2b = inner_join(data_cleveland_2a, tab_cleveland_2, 
+                               by="country") %>%
                         group_by(country) %>% summarise(max=max(mag))
 
 cleveland_2 = ggplot(data_cleveland_2b, aes(x=max, y=reorder(country,max))) +
                   geom_point(color="darkblue", size = 2.5) +
                   geom_segment(aes(x=min(terremoti2$mag), xend=max,
-                                   y=reorder(country,max), yend=reorder(country,max)),
+                                   y=reorder(country,max), 
+                                   yend=reorder(country,max)),
                                color="lightblue") +
                   theme_minimal() + 
                   theme(panel.grid.major=element_blank(),
@@ -496,46 +487,58 @@ cleveland_2 = ggplot(data_cleveland_2b, aes(x=max, y=reorder(country,max))) +
 
 grid.arrange(cleveland_1, cleveland_2, nrow=1)
 
-rm(data_cleveland, cleveland_1, cleveland_2, data_cleveland_2a, data_cleveland_2b, tab_cleveland_2)
+rm(data_cleveland, cleveland_1, cleveland_2, data_cleveland_2a, 
+   data_cleveland_2b, tab_cleveland_2)
 
 ```
 
 Infine, il Cleveland plot soprastante riporta per i vari continenti e per i vari stati sudamericani la magnitudo massima rilevata. Da essi si evince come il valore massimo della magnitudo nel periodo 1975-2025 è stato rilevato in Sudamerica e in particolare in Cile.
 
 
+
+ome accennato in precedenza, esiste una correlazione tra le faglie tettoniche e la probabilità di verificarsi di un terremoto. A tal proposito, qui sotto è riportata una mappa del mondo in cui sono evidenziate in rosso le faglie attive. I pallini rappresentano un sotto-campione contenente il 15% di tutti i terremoti presenti nel dataset di origine tettonica. Per ogni terremoto, la dimensione del pallino è proporzionale alla magnitudine dell'evento sismico.
+
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-# Diminuisco il campione e filtro i terremoti di origine naturale
+
 terremoti_sampled <- terremoti %>%
   group_by(type) %>%
-  filter(!(type == "earthquake" & runif(n()) < 0.85))
+  filter(!(runif(n()) < 0.85))%>%
+  filter(type == "earthquake")
 
 ggplot() +
-  # Aggiungi la mappa del mondo
   borders("world", colour = "gray50", fill = "lightgray") + 
-  # Aggiungi le faglie
   geom_sf(data = faglie, color = "red", size = 1, alpha = 0.7) +
-  # Aggiungi i terremoti
-  geom_point(data = terremoti_sampled, aes(x = longitude, y = latitude, color = type, size = mag), alpha = 0.3) +
+  geom_point(data = terremoti_sampled, aes(x = longitude, y = latitude, 
+                                           color = type, 
+                                           size = mag), alpha = 0.3) +
   scale_color_brewer(palette = "Set2") + 
   scale_size_continuous(range = c(0.5, 3)) + 
-  labs(title = "Terremoti e Faglie Geologiche", x = "Longitudine", y = "Latitudine", color = "Magnitudo") +
+  labs(title = "Terremoti e Faglie Geologiche", 
+       x = "Longitudine", 
+       y = "Latitudine") +
   theme_minimal(base_size = 14) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
     legend.position = "right"
-  )
+  )+ 
+  guides(color = "none")
 ```
-
+Come si può osservare dal grafico, i terremoti tendono a concentrarsi principalmente lungo le faglie tettoniche. Tuttavia, nel dataset sono presenti anche terremoti di origine diversa, come quelli causati dall'uomo, ad esempio dalle esplosioni nucleari. Per questo motivo, nel grafico sottostante sono rappresentati tutti i terremoti, differenziati in base al colore in funzione della loro origine.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 terremoti_sampled_2 <- terremoti %>%
   filter(type != "earthquake")
 
 ggplot() +
   borders("world", colour = "gray50", fill = "lightgray") +
-  geom_point(data = terremoti_sampled_2, aes(x = longitude, y = latitude, color = type, size = mag), alpha = 0.6) +
+  geom_point(data = terremoti_sampled_2, aes(x = longitude, 
+                                             y = latitude, 
+                                             color = type, 
+                                             size = mag), 
+             alpha = 0.6) +
   scale_size_continuous(range = c(1, 4)) +
-  labs(title = "Terremoti non dovuti a faglie", x = "Longitudine", y = "Latitudine", 
+  labs(title = "Terremoti non dovuti a faglie", 
+       x = "Longitudine", y = "Latitudine", 
        color = "Tipo di Terremoto", size = "Magnitudo") +
   theme_minimal(base_size = 14) +
   theme(
@@ -544,7 +547,7 @@ ggplot() +
     legend.position = "right"
   )
 ```
-
+Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 frequenza_terremoti <- terremoti %>%
   count(type) %>%
@@ -557,26 +560,30 @@ frequenza_terremoti <- frequenza_terremoti %>%
   summarise(n = sum(n), Percentuale = sum(Percentuale)) %>%
   ungroup()
 
-ggplot(data = frequenza_terremoti, aes(x = reorder(type, Percentuale), y = Percentuale)) +
+ggplot(data = frequenza_terremoti, 
+       aes(x = reorder(type, Percentuale), y = Percentuale)) +
   geom_bar(stat = "identity", fill = "#4CAF50", color = "black", width = 0.7) +
   coord_flip() +  
-  labs(title = "Frequenza Percentuale dei Terremoti per Tipo", 
+  labs(title = "Percentuale dei terremoti divisi per tipo", 
        x = "Tipo di Terremoto", 
        y = "Percentuale (%)") +
   theme_minimal(base_size = 15) +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18, face = "bold", color = "#2C3E50"),
+    plot.title = element_text(hjust = 0.5, size = 18, 
+                              face = "bold", 
+                              color = "#2C3E50"),
     axis.text.x = element_text(size = 12, color = "#2C3E50"),
     axis.text.y = element_text(size = 12, color = "#2C3E50"),
     axis.title = element_text(size = 14, color = "#2C3E50"),
     panel.grid.major = element_line(color = "gray90"),
     panel.grid.minor = element_blank(),  
     axis.ticks = element_line(color = "gray80"), 
-    plot.margin = margin(10, 20, 10, 20)
+    plot.margin = margin(10, 20, 10, 30),
   ) +
-  geom_text(aes(label = round(Percentuale, 1)), hjust = -0.2, color = "#2C3E50", size = 5)
+  geom_text(aes(label = paste0(round(Percentuale, 0), "%")), 
+            hjust = -.15, color = "#2C3E50", size = 3)
 ```
-
+Dal grafico emerge che solo l'1% di tutti i terremoti verificatisi dal 1970 al 2025 è stato causato da fattori legati all'attività umana, mentre la restante parte è dovuta a fenomeni di origine naturale. Tuttavia, osservando il grafico sottostante, si può notare che la maggior parte di questi terremoti causati dall'uomo è riconducibile a esplosioni nucleari, con ben l'87% dei terremoti attribuibili a questa orignine.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
 frequenza_terremoti_minori <- terremoti %>%
@@ -589,7 +596,7 @@ ggplot(data = frequenza_terremoti_minori, aes(x = reorder(type, Percentuale),
                                               y = Percentuale)) +
   geom_bar(stat = "identity", fill = "#007fff", color = "black", width = 0.7) +
   coord_flip() +  
-  labs(title = "Frequenza Percentuale dei Terremoti per Tipo (Altri)", 
+  labs(title = "Percentuale dei terremoti per Tipo", 
        x = "Tipo di Terremoto", 
        y = "Percentuale (%)") +
   theme_minimal(base_size = 15) +
@@ -604,9 +611,13 @@ ggplot(data = frequenza_terremoti_minori, aes(x = reorder(type, Percentuale),
     axis.ticks = element_line(color = "gray80"), 
     plot.margin = margin(10, 20, 10, 20)
   ) +
-  geom_text(aes(label = round(Percentuale, 1)), hjust = -0.2,
-            color = "#2C3E50", size = 5)
+  geom_text(aes(label = paste0(round(Percentuale, 0), "%")), hjust = -0.15,
+            color = "#2C3E50", size = 2.6)
 ```
+
+Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ...). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri.
+
+Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi, ma ha probabilmente escluso altri. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 usa_state = c("Alabama", "Alaska", "Arizona", "Arkansas",
               "California", "Colorado", "Connecticut", 
@@ -698,16 +709,18 @@ ggplot(stati_importanti, aes(x="", y=Percentuale, fill=state)) +
   labs(title="PIE CHART degli Stati",
        fill="Stati")
 ```
+Come si può osservare dal dataset, è stato possibile suddividere i terremoti in base alla nazione di appartenenza utilizzando il nuovo metodo. Grazie a questo approccio, è stato possibile creare un grafico a torta che mostra la distribuzione percentuale delle nazioni con la maggiore frequenza di terremoti nella serie storica considerata. Anche in questo caso, emerge chiaramente che il continente con il maggior numero di terremoti è l'Asia.
 
-
-
+Per approfondire ulteriormente, è stato realizzato un altro grafico in cui gli stati sono stati colorati in modo diverso in base alla percentuale globale di terremoti che si sono verificati al loro interno. Gli stati per cui non è stato possibile reperire dati, o che probabilmente sono stati esclusi durante il processo di filtraggio, sono stati rappresentati in grigio.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
 asia <- world %>% filter(continent == "Asia")
 
 # Converte i dati dei punti in un oggetto sf
-merged_data_sf <- st_as_sf(merged_data_clean, coords = c("longitude", "latitude"), crs = st_crs(asia))
+merged_data_sf <- st_as_sf(merged_data_clean, 
+                           coords = c("longitude", "latitude"), 
+                           crs = st_crs(asia))
 
 # Filtro i punti che sono dentro il continente africano
 merged_data_filtered <- st_intersection(merged_data_sf, asia)
@@ -735,7 +748,8 @@ ggplot(data = asia_merged) +
                   aes(x = longitude, y = latitude, label = str_to_title(state)), 
                   size = 2.5, fontface = "bold") +
   labs(title = "Asia e faglie geologiche", x = "Longitudine",
-       y = "Latitudine", fill = "Percentuale",
+       y = "Latitudine", 
+       fill = "Percentuale",
        caption = 'In grigio sono indicati gli stati su cui non abbiamo dati.') +
   guides(fill = guide_colorbar(title = "Perc.",
                                title.position = "top",
@@ -750,16 +764,18 @@ ggplot(data = asia_merged) +
     legend.text = element_text(size = 12),
   )
 ```
-
+Dal nuovo dataset è stato possibile riprodurre nuovamente il grafico Cleveland, che mostra gli stati con i terremoti più forti nell'intera serie storica considerata. Come si può osservare, ora è visibile un terremoto di magnitudo 9.1 in Giappone, che era stato escluso nel grafico precedente, nella categoria Asia, per lo stesso tipo di grafico. Questo evidenzia come il nuovo approccio abbia consentito di includere eventi sismici che in precedenza erano stati omessi.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 max_magnitudes <- terremoti %>%
   filter(type == "earthquake") %>%
-  separate(place, into = c("location", "state"), sep = ",", extra = "drop") %>%
+  separate(place, into = c("location", "state"), sep = ",", 
+           extra = "drop") %>%
   mutate(state = trimws(state)) %>%
   filter(!is.na(state)) %>%
   mutate(state = tolower(state)) %>%
-  mutate(state = str_replace_all(state,
-                                 "region|earthquake|sequence|california-baja", "")) %>%
+  mutate(state = str_replace_all(
+    state,
+    "region|earthquake|sequence|california-baja", "")) %>%
   mutate(state = str_trim(state)) %>%
   mutate(state = case_when(
     state %in% usa_state ~ "usa",
@@ -789,8 +805,9 @@ ggplot(max_magnitudes,
                    yend = reorder(state, Max_Mag)),
                color = "lightgrey") +
   scale_x_continuous(breaks = seq(limite, 10, by = 0.2)) +
-  scale_y_discrete(labels = function(x) ifelse(tolower(x) == "usa", "USA", str_to_title(x))) +
-  labs (x = "MAG",
+  scale_y_discrete(labels = function(x) ifelse(tolower(x) == "usa", 
+                                               "USA", str_to_title(x))) +
+  labs (x = "Magnitudo",
         y = "",
         title = "Terremoti più forti per ogni stato",
         subtitle = "Dal 1970 al 2014") +
@@ -798,11 +815,11 @@ ggplot(max_magnitudes,
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
-
+Infine, per visualizzare il contributo dei vari tipi di terremoti rispetto al totale nella serie storica, è stato creato il grafico sottostante. Tuttavia, poiché la maggior parte dei terremoti è di origine tettonica (earthquake), è stato necessario escludere questa tipologia per evidenziare le altre. La serie storica è stata suddivisa in intervalli di 5 anni e, per ogni gruppo, è stato misurato il numero di terremoti per ciascuna tipologia. Il grafico mostra, quindi, come è variata nel tempo la percentuale delle diverse tipologie di terremoti rispetto al totale.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 df_filtered <- terremoti %>%
-  filter(!type %in% c("rock burst", "mine collapse")) %>%
+  filter(type != "earthquake") %>%
   mutate(time = ymd_hms(time, tz = "UTC"),
          year = year(time)) %>%
   mutate(year_group = cut(year, 
@@ -814,7 +831,12 @@ df_filtered <- terremoti %>%
   
 ggplot(df_filtered, aes(x = year_group, fill = type, weight = count)) + 
   geom_bar(position = "fill") +
-  scale_y_continuous(trans = "log") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  labs(y = 'log(#)', x = "Anni", title = "Grafico in scala logaritmica dei vari terremoti")
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        plot.margin = margin(0, 50, 0, 0))+
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(y = 'Percentuale', x = "Gruppi di Anni",
+        fill = "Tipologgia",
+       title = "Percentuale per tipologie di terremoti negli anni")
 ```
