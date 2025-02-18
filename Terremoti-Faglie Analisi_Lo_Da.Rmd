@@ -222,7 +222,7 @@ Al contrario, con meno stazioni la copertura è più concentrata, generando un g
 - __Horizontal Error e depth error__: L'errore orizzontale e l'errore di profondità sono spesso correlati perché entrambi dipendono dalla qualità e dalla distribuzione dei dati sismici. Una scarsa copertura strumentale o una geometria sfavorevole possono influenzare simultaneamente la precisione della localizzazione sia in orizzontale che in profondità.
 
 
-Attraerso il segguente grafico possiamo dare una migliore interpetazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot unito ad con fit di un modello lineare.
+Attraerso il seguente grafico possiamo dare una migliore interpetazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot unito ad con fit di un modello lineare.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # seleziono le variabili per l'analisi
@@ -407,7 +407,7 @@ cbind(min = tapply(terremoti2$mag, droplevels(terremoti2$continent), min),
       sd = tapply(terremoti2$mag, droplevels(terremoti2$continent), sd))
 
 ```
-Inoltre, riportiamo di seguito prima il ridgeline graph e poi il cleveland plot. Avendo notato che il valore massimo della magnitudo è stato rilevato in Sudamerica, abbiamo deciso di approfondire il comportamento del fenomeno in questa macroregione. Specifichiamo che nei grafici relativi al al solo Sudamerica sono stati considerati soltanto gli stati per cui il numero di osservazioni a disposizione fosse almeno pari a 30.
+Inoltre, riportiamo di seguito prima il ridgeline graph e poi il cleveland plot. Avendo notato che il valore massimo della magnitudo è stato rilevato in Sudamerica, abbiamo deciso di approfondire il comportamento del fenomeno in questa macroregione. Specifichiamo che nei grafici relativi al solo Sudamerica sono stati considerati soltanto gli stati per cui il numero di osservazioni a disposizione fosse almeno pari a 30.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -442,8 +442,8 @@ rm(ridge_1, ridge_2, data_ridge_2a, data_ridge_2b, tab_ridge_2)
 
 ```
 
-Dal ridgeline graph per continente si evince che le varie distribuzioni presentano un andamento molto simile tra loro e simile a quello relativo alla distribuzione della magnitudo sull'intero database, mostrato nell'istogramma di pagina XX.
-Concentrando poi l'attenzione sul solo Sudamerica, la distribuzione della magnitudo risulta sempre simile tra i vari stati con una forte assimmetria positiva; soltanto il Brasile presenta una distribuzione visibilmente differente.
+Dal ridgeline graph per continente si evince che le varie distribuzioni presentano un andamento molto simile tra loro e simile a quello relativo alla distribuzione della magnitudo sull'intero database, mostrato nell'istogramma di pagina 5.
+Concentrando poi l'attenzione sul Sudamerica, la distribuzione della magnitudo risulta sempre simile tra i vari stati con una forte assimmetria positiva; soltanto il Brasile presenta una distribuzione visibilmente differente.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -496,7 +496,7 @@ Infine, il Cleveland plot soprastante riporta per i vari continenti e per i vari
 
 
 
-ome accennato in precedenza, esiste una correlazione tra le faglie tettoniche e la probabilità di verificarsi di un terremoto. A tal proposito, qui sotto è riportata una mappa del mondo in cui sono evidenziate in rosso le faglie attive. I pallini rappresentano un sotto-campione contenente il 15% di tutti i terremoti presenti nel dataset di origine tettonica. Per ogni terremoto, la dimensione del pallino è proporzionale alla magnitudine dell'evento sismico.
+Come accennato in precedenza, esiste una correlazione tra le faglie tettoniche e la probabilità di verificarsi di un terremoto. A tal proposito, qui sotto è riportata una mappa del mondo in cui sono evidenziate in rosso le faglie attive. I pallini rappresentano un sotto-campione contenente il 15% di tutti i terremoti presenti nel dataset di origine tettonica. Per ogni terremoto, la dimensione del pallino è proporzionale alla magnitudo dell'evento sismico.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -547,7 +547,7 @@ ggplot() +
     legend.position = "right"
   )
 ```
-Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici.
+Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici, dal quale emerge che solo l'1% di tutti i terremoti verificatisi nel perido studiato è stato causato da fattori legati all'attività umana, mentre la restante parte è dovuta a fenomeni di origine naturale.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 frequenza_terremoti <- terremoti %>%
   count(type) %>%
@@ -583,7 +583,7 @@ ggplot(data = frequenza_terremoti,
   geom_text(aes(label = paste0(round(Percentuale, 0), "%")), 
             hjust = -.15, color = "#2C3E50", size = 3)
 ```
-Dal grafico emerge che solo l'1% di tutti i terremoti verificatisi dal 1970 al 2025 è stato causato da fattori legati all'attività umana, mentre la restante parte è dovuta a fenomeni di origine naturale. Tuttavia, osservando il grafico sottostante, si può notare che la maggior parte di questi terremoti causati dall'uomo è riconducibile a esplosioni nucleari, con ben l'87% dei terremoti attribuibili a questa orignine.
+In particolare, osservando il grafico sottostante, si può notare che la maggior parte dei terremoti causati dall'uomo è riconducibile a esplosioni nucleari, con ben l'87% dei terremoti attribuibili a questa origine.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
 frequenza_terremoti_minori <- terremoti %>%
@@ -615,7 +615,7 @@ ggplot(data = frequenza_terremoti_minori, aes(x = reorder(type, Percentuale),
             color = "#2C3E50", size = 2.6)
 ```
 
-Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ...). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri.
+Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ...). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri. 
 
 Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi, ma ha probabilmente escluso altri. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
@@ -815,7 +815,7 @@ ggplot(max_magnitudes,
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
-Infine, per visualizzare il contributo dei vari tipi di terremoti rispetto al totale nella serie storica, è stato creato il grafico sottostante. Tuttavia, poiché la maggior parte dei terremoti è di origine tettonica (earthquake), è stato necessario escludere questa tipologia per evidenziare le altre. La serie storica è stata suddivisa in intervalli di 5 anni e, per ogni gruppo, è stato misurato il numero di terremoti per ciascuna tipologia. Il grafico mostra, quindi, come è variata nel tempo la percentuale delle diverse tipologie di terremoti rispetto al totale.
+Infine, per visualizzare il contributo dei vari tipi di terremoti rispetto al totale nella serie storica, è stato creato il grafico di cui sotto. Tuttavia, poiché la maggior parte dei terremoti è di origine tettonica (earthquake), è stato necessario escludere questa tipologia per evidenziare le altre. La serie storica è stata suddivisa in intervalli di 5 anni e, per ogni gruppo, è stato misurato il numero di terremoti per ciascuna tipologia. Il grafico mostra, quindi, come è variata nel tempo la percentuale delle diverse tipologie di terremoti rispetto al totale.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 df_filtered <- terremoti %>%
