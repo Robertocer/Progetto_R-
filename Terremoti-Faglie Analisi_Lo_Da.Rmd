@@ -30,6 +30,7 @@ library(tidyr)
 library(corrplot)
 library(ggcorrplot)
 library(GGally)
+library(pander)
 ```
 ## Dataset Faglie
 
@@ -69,7 +70,6 @@ Il nostro dataset è composto da 22 variabili di varia natura.Per semplicità, m
 
 
 ```{r echo=TRUE}
-library(pander)
 pander(head(terremoti %>% 
               select(latitude, longitude, depth, mag, nst, type, time)))
 
@@ -524,7 +524,7 @@ ggplot() +
   )+ 
   guides(color = "none")
 ```
-Come si può osservare dal grafico, i terremoti tendono a concentrarsi principalmente lungo le faglie tettoniche. Tuttavia, nel dataset sono presenti anche terremoti di origine diversa, come quelli causati dall'uomo, ad esempio dalle esplosioni nucleari. Per questo motivo, nel grafico sottostante sono rappresentati tutti i terremoti, differenziati in base al colore in funzione della loro origine.
+Come si può osservare dal grafico, i terremoti tendono a concentrarsi principalmente lungo le faglie tettoniche. Tuttavia, nel dataset sono presenti anche terremoti di origine diversa, come quelli causati dall'uomo o da vulcani. Per questo motivo, nel grafico sottostante sono rappresentati tutti i terremoti di origine non tettonica. Nel grafico i terremoti sono stati suddivisi per colore in funzione della loro origine.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 terremoti_sampled_2 <- terremoti %>%
   filter(type != "earthquake")
@@ -547,7 +547,7 @@ ggplot() +
     legend.position = "right"
   )
 ```
-Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici, dal quale emerge che solo l'1% di tutti i terremoti verificatisi nel perido studiato è stato causato da fattori legati all'attività umana, mentre la restante parte è dovuta a fenomeni di origine naturale.
+Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici, dal quale emerge che solo l'1% di tutti i terremoti verificatisi nel perido studiato è stato causato da fattori legati all'attività umana o vulcanica, mentre la restante parte è dovuta a fenomeni di origine esclusivamente naturale.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 frequenza_terremoti <- terremoti %>%
   count(type) %>%
@@ -583,7 +583,7 @@ ggplot(data = frequenza_terremoti,
   geom_text(aes(label = paste0(round(Percentuale, 0), "%")), 
             hjust = -.15, color = "#2C3E50", size = 3)
 ```
-In particolare, osservando il grafico sottostante, si può notare che la maggior parte dei terremoti causati dall'uomo è riconducibile a esplosioni nucleari, con ben l'87% dei terremoti attribuibili a questa origine.
+In particolare, osservando il grafico sottostante, si può notare che la maggior parte dei terremoti non dovuti a faglie sono statati causati dall'uomo con delle esplosioni nucleari.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
 frequenza_terremoti_minori <- terremoti %>%
@@ -615,9 +615,9 @@ ggplot(data = frequenza_terremoti_minori, aes(x = reorder(type, Percentuale),
             color = "#2C3E50", size = 2.6)
 ```
 
-Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ...). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri. 
+Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente rispetto al precedente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ecc.). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri. 
 
-Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi, ma ha probabilmente escluso altri. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
+Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi, ma ha probabilmente ne ha escluso altri. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 usa_state = c("Alabama", "Alaska", "Arizona", "Arkansas",
               "California", "Colorado", "Connecticut", 
@@ -709,9 +709,9 @@ ggplot(stati_importanti, aes(x="", y=Percentuale, fill=state)) +
   labs(title="PIE CHART degli Stati",
        fill="Stati")
 ```
-Come si può osservare dal dataset, è stato possibile suddividere i terremoti in base alla nazione di appartenenza utilizzando il nuovo metodo. Grazie a questo approccio, è stato possibile creare un grafico a torta che mostra la distribuzione percentuale delle nazioni con la maggiore frequenza di terremoti nella serie storica considerata. Anche in questo caso, emerge chiaramente che il continente con il maggior numero di terremoti è l'Asia.
+Come si può osservare dal dataset, è stato possibile suddividere i terremoti in base alla nazione di appartenenza utilizzando il nuovo metodo. Grazie a questo approccio, è stato possibile creare un grafico a torta che mostra la distribuzione percentuale delle nazioni con la maggiore frequenza di terremoti nella serie storica considerata.
 
-Per approfondire ulteriormente, è stato realizzato un altro grafico in cui gli stati sono stati colorati in modo diverso in base alla percentuale globale di terremoti che si sono verificati al loro interno. Gli stati per cui non è stato possibile reperire dati, o che probabilmente sono stati esclusi durante il processo di filtraggio, sono stati rappresentati in grigio.
+Per un ulteriore analisi, è stato realizzato un altro grafico in cui gli stati sono stati colorati in modo diverso in base alla percentuale globale di terremoti che si sono verificati al loro interno. Le nazini per cui non è stato possibile reperire dati, o che probabilmente sono stati esclusi durante il processo di filtraggio, sono stati rappresentati in grigio.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
@@ -815,7 +815,7 @@ ggplot(max_magnitudes,
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 ```
-Infine, per visualizzare il contributo dei vari tipi di terremoti rispetto al totale nella serie storica, è stato creato il grafico di cui sotto. Tuttavia, poiché la maggior parte dei terremoti è di origine tettonica (earthquake), è stato necessario escludere questa tipologia per evidenziare le altre. La serie storica è stata suddivisa in intervalli di 5 anni e, per ogni gruppo, è stato misurato il numero di terremoti per ciascuna tipologia. Il grafico mostra, quindi, come è variata nel tempo la percentuale delle diverse tipologie di terremoti rispetto al totale.
+Infine, per visualizzare il contributo dei vari tipi di terremoti rispetto al totale nella serie storica, è stato creato il grafico di cui sotto. Tuttavia, poiché la maggior parte dei terremoti è di origine tettonica (earthquake), è stato necessario escludere questa tipologia per evidenziare le altre. La serie storica è stata suddivisa in gruppi con intervalli di 5 anni e, per ogni gruppo, è stato misurato il numero di terremoti per ciascuna tipologia. Il grafico mostra, quindi, come è variata nel tempo la percentuale delle diverse tipologie di terremoti rispetto al totale.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 df_filtered <- terremoti %>%
