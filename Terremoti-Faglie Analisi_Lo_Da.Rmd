@@ -1,5 +1,6 @@
 ---
 title: "Analisi dei Terremoti e delle faglie nel mondo (1970-2025)"
+author: "Roberto Cerminara, Daniele Florio, Lorenzo Piattoli"
 output:
   pdf_document: default
   html_document: default
@@ -837,6 +838,6 @@ ggplot(df_filtered, aes(x = year_group, fill = type, weight = count)) +
   scale_fill_brewer(palette = "Set1") +
   scale_y_continuous(labels = scales::percent) +
   labs(y = 'Percentuale', x = "Gruppi di Anni",
-        fill = "Tipologgia",
+        fill = "Tipologia",
        title = "Percentuale per tipologie di terremoti negli anni")
 ```
