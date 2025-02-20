@@ -215,15 +215,14 @@ ggcorrplot(df_f,
 
 Dal correlation plot si evince che le correlazioni fra le variabili di maggiore interesse sono le seguenti: 
 
-- __Mag e nst__: Queste due variabili appartengono rispettivamente al livello di magnitudo  e al numero di stazioni sismiche che hanno registrato il terremoto. Sono correlate positivamente in quanto un evento con alta magnitudo sarà rilevato da piu stazioni sismiche presenti nel mondo.
-- __nst e gap__: Con un maggior numero di stazioni (nst elevato), la copertura attorno all'epicentro è più uniforme, riducendo il gap.
-Al contrario, con meno stazioni la copertura è più concentrata, generando un gap più ampio.
-- __Mag Error e magNst__:  Queste due variabili appartengono rispettivamente al livello di magnitudo  e al numero di stazioni sismiche che hanno partecipato alla determinazione della magnitudo. Per questo motivo osserviamo un coefficiente di correlazione negativo. 
-- __Horizontal Error e dmin__: L'errore orizzontale potrebbe essere correlato alla distanza minima (dmin) perché terremoti più lontani dalla rete di rilevamento (maggiore dmin) tendono ad avere una localizzazione meno precisa, aumentando l'errore orizzontale. Questo è dovuto alla geometria della rete sismica e alla riduzione della precisione con la distanza.
+- __Mag e nst__: Queste due variabili appartengono rispettivamente al livello di magnitudo  e al numero di stazioni sismiche che hanno registrato il terremoto. Probabilmente la correlazione è positiva in quanto un evento con alta magnitudo sarà rilevato da più stazioni sismiche presenti nel mondo.
+- __nst e gap__: Probabilmente la correlazione è negativa dato che all'aumentare del numero di stazioni (**nst** elevato), la copertura attorno all'epicentro è più uniforme, riducendo il **gap**. Al contrario, con meno stazioni la copertura è più concentrata, generando un **gap** più ampio.
+- __Mag Error e magNst__:  Queste due variabili si riferiscono rispettivamente all'errore sul livello di magnitudo, e all'errore sul numero di stazioni sismiche che hanno partecipato alla determinazione della magnitudo. In questo caso la correlazione potrebbe essere spiegata dal fatto che più stazioni partecipano alla misura più l'errore sulla misura stessa sarà ridotto. 
+- __Horizontal Error e dmin__: L'errore orizzontale potrebbe essere correlato alla distanza minima (**dmin**) perché terremoti più lontani dalla rete di rilevamento (maggiore dmin) tendono ad avere una localizzazione meno precisa, aumentando l'errore orizzontale. Questo è dovuto alla geometria della rete sismica e alla riduzione della precisione con la distanza.
 - __Horizontal Error e depth error__: L'errore orizzontale e l'errore di profondità sono spesso correlati perché entrambi dipendono dalla qualità e dalla distribuzione dei dati sismici. Una scarsa copertura strumentale o una geometria sfavorevole possono influenzare simultaneamente la precisione della localizzazione sia in orizzontale che in profondità.
 
 
-Attraverso il seguente grafico possiamo dare una migliore interpetazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot uniti ciascuno ad un fit di un modello lineare.
+Attraverso il seguente grafico possiamo dare una migliore interpretazione di quelli che sono i coefficienti di correlazione di alcune variabili già viste in precedenza, unite alla loro densità di kernel, mostrata sulla diagonale principale. Nella parte triangolare inferiore della matrice possiamo identificare gli scatterplot uniti ciascuno ad un fit di un modello lineare.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # seleziono le variabili per l'analisi
@@ -258,7 +257,7 @@ theme_bw()
 
 ```
 
-Tra le varie relazioni evidenziate sopra abbiamo deciso di concentrare l'attenzione sul legame tra le variabili dmin (distanza dalla stazione più vicina) e HorizontalError (errore sul rilevamento della posizione), che presentano una correlazione positiva pari a 0.30, come mostrato nel primo correlation plot. Pertanto al fine di approfondire questa relazione abbiamo deciso di rappresentare lo scatterplot delle due variabili e di confrontare l'adattamento di un modello lineare rispetto ad un modello GAM (Generalized Additive Model), il quale è il modello che si adatta meglio ai dati. In conclusione, possiamo dire che la relazione tra queste due variabili risulta non lineare.
+Tra le varie relazioni evidenziate sopra abbiamo deciso di concentrare l'attenzione sul legame tra le variabili **dmin** (distanza dalla stazione più vicina) e **HorizontalError** (errore sul rilevamento della posizione), che presentano una correlazione positiva pari a 0.30, come mostrato nel primo correlation plot. Pertanto al fine di approfondire questa relazione abbiamo deciso di rappresentare lo scatterplot delle due variabili e di confrontare l'adattamento di un modello lineare rispetto ad un modello GAM (Generalized Additive Model), il quale è il modello che si adatta meglio ai dati. In conclusione, possiamo dire che la relazione tra queste due variabili risulta non lineare.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -525,7 +524,7 @@ ggplot() +
   )+ 
   guides(color = "none")
 ```
-Come si può osservare dal grafico, i terremoti tendono a concentrarsi principalmente lungo le faglie tettoniche. Tuttavia, nel dataset sono presenti anche terremoti di origine diversa, come quelli causati dall'uomo o da vulcani. Per questo motivo, nel grafico sottostante sono rappresentati tutti i terremoti di origine non tettonica. Nel grafico i terremoti sono stati suddivisi per colore in funzione della loro origine.
+Come si può osservare dal grafico, i terremoti tendono a concentrarsi principalmente lungo le faglie tettoniche. Tuttavia, nel dataset sono presenti anche terremoti di origine diversa, come quelli causati dall'uomo o da vulcani. Per questo motivo, nel grafico sottostante sono rappresentati tutti i terremoti di origine non tettonica. Nel grafico i terremoti sono stati suddivisi per colore in base alla loro origine.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 terremoti_sampled_2 <- terremoti %>%
   filter(type != "earthquake")
@@ -548,7 +547,7 @@ ggplot() +
     legend.position = "right"
   )
 ```
-Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici, dal quale emerge che solo l'1% di tutti i terremoti verificatisi nel perido studiato è stato causato da fattori legati all'attività umana o vulcanica, mentre la restante parte è dovuta a fenomeni di origine esclusivamente naturale.
+Come osservato in precedenza, i terremoti sono per la maggior parte di origine tettonica. Per questo motivo, è stato creato un barplot che mostra la distribuzione percentuale tra i terremoti di origine tettonica e tutti gli altri eventi sismici, dal quale emerge che solo l'1% di tutti i terremoti verificatisi nel periodo studiato è stato causato da fattori legati all'attività umana o vulcanica, mentre la restante parte è dovuta a fenomeni di origine esclusivamente naturale.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 frequenza_terremoti <- terremoti %>%
   count(type) %>%
@@ -618,7 +617,7 @@ ggplot(data = frequenza_terremoti_minori, aes(x = reorder(type, Percentuale),
 
 Nel dataset analizzato, oltre alle colonne precedenti, è presente anche la variabile **place**, che contiene informazioni sulla localizzazione del terremoto, incluso lo stato in cui si è verificato. Per estrapolare lo stato di appartenenza di ciascun terremoto, è stato adottato un approccio differente rispetto al precedente. La difficoltà principale risiedeva nel fatto che gli Stati Uniti d'America non sono indicati come un'unica nazione (USA), ma come singoli stati ("Alabama", "Alaska", "Arizona", ecc.). Di conseguenza, è stato necessario raggrupparli sotto un unico nome. Inoltre, a fianco del nome della nazione, a volte comparivano termini come "region", "earthquake", "baja", che hanno richiesto un'eliminazione manuale. Questo approccio ha escluso alcuni terremoti nei quali la variabile è risultata vuota o non rientrava nel pattern utilizzato per gli altri. 
 
-Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi, ma probabilmente ne ha escluso altri. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
+Tuttavia, come sarà spiegato successivamente, questo nuovo approccio ha permesso di includere alcuni terremoti che in precedenza erano stati esclusi. Qui di seguito è riportato il codice utilizzato per il filtraggio e il raggruppamento degli eventi sismici.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 usa_state = c("Alabama", "Alaska", "Arizona", "Arkansas",
               "California", "Colorado", "Connecticut", 
@@ -680,7 +679,7 @@ centroids_world <- world_map %>%
 merged_data <- merge(earthquakes, centroids_world, by.x = "state",
                      by.y = "region", all.x = TRUE)
 
-# Rimuovi i valori NA nelle coordinate
+# Rimuovo i valori NA nelle coordinate
 merged_data_clean <- merged_data %>% 
   filter(!is.na(longitude) & !is.na(latitude)) %>%
   arrange(-n)
@@ -712,13 +711,13 @@ ggplot(stati_importanti, aes(x="", y=Percentuale, fill=state)) +
 ```
 Come si può osservare dal dataset, è stato possibile suddividere i terremoti in base alla nazione di appartenenza utilizzando il nuovo metodo. Grazie a questo approccio, è stato possibile creare un grafico a torta che mostra la distribuzione percentuale delle nazioni con la maggiore frequenza di terremoti nella serie storica considerata.
 
-Per un ulteriore analisi, è stato realizzato un altro grafico in cui gli stati sono stati colorati in modo diverso in base alla percentuale globale di terremoti che si sono verificati al loro interno. Le nazioni per cui non è stato possibile reperire dati, o che probabilmente sono stati esclusi durante il processo di filtraggio, sono stati rappresentati in grigio.
+Dato che nella lista degli stati più sismici molti si trovano in Asia, è stato realizzato un altro grafico in cui gli stati sono stati colorati in modo diverso in base alla percentuale globale di terremoti che si sono verificati sul loro territorio. Le nazioni per cui non è stato possibile reperire dati, o che probabilmente sono stati esclusi durante il processo di filtraggio, sono stati rappresentati in grigio. Mentre, in viola chiaro sono indicate le faglie attive presenti sul continente.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
 asia <- world %>% filter(continent == "Asia")
 
-# Converte i dati dei punti in un oggetto sf
+# Converto i dati dei punti in un oggetto sf
 merged_data_sf <- st_as_sf(merged_data_clean, 
                            coords = c("longitude", "latitude"), 
                            crs = st_crs(asia))
@@ -726,7 +725,7 @@ merged_data_sf <- st_as_sf(merged_data_clean,
 # Filtro i punti che sono dentro il continente africano
 merged_data_filtered <- st_intersection(merged_data_sf, asia)
 
-# Estraggog le coordinate dalla geometria
+# Estraggo le coordinate dalla geometria
 merged_data_filtered <- merged_data_filtered %>%
   mutate(longitude = st_coordinates(geometry)[, 1],
          latitude = st_coordinates(geometry)[, 2])
@@ -748,10 +747,10 @@ ggplot(data = asia_merged) +
   geom_text_repel(data = merged_data_filtered, 
                   aes(x = longitude, y = latitude, label = str_to_title(state)), 
                   size = 2.5, fontface = "bold") +
-  labs(title = "Asia e faglie geologiche", x = "Longitudine",
+  labs(title = "Mappa dell'Asia", x = "Longitudine",
        y = "Latitudine", 
        fill = "Percentuale",
-       caption = 'In grigio sono indicati gli stati su cui non abbiamo dati.') +
+       subtitle = 'La mappa mostra gli stati asiatici con più terremoti a livello globale.') +
   guides(fill = guide_colorbar(title = "Perc.",
                                title.position = "top",
                                barwidth = 0.8, barheight = 15)) +
@@ -760,12 +759,13 @@ ggplot(data = asia_merged) +
     axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
     axis.text.y = element_text(size = 12),
     plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+    plot.subtitle = element_text(size = 10),
     legend.position = "right",
     legend.title = element_text(size = 14, face = "bold"),
     legend.text = element_text(size = 12),
   )
 ```
-Dal nuovo dataset è stato possibile riprodurre nuovamente il grafico Cleveland, che mostra gli stati con i terremoti più forti nell'intera serie storica considerata. Come si può osservare, ora è visibile un terremoto di magnitudo 9.1 in Giappone, che era stato escluso nel grafico precedente, nella categoria Asia, per lo stesso tipo di grafico. Questo evidenzia come il nuovo approccio abbia consentito di includere eventi sismici che in precedenza erano stati omessi.
+Dal nuovo dataset è stato possibile riprodurre nuovamente il grafico Cleveland, che mostra gli stati con i terremoti più forti nell'intera serie storica considerata. Come si può osservare, ora è visibile un terremoto di magnitudo 9.1 in Giappone, che era stato escluso nel grafico precedente, nella categoria Asia, per lo stesso tipo di grafico. Questo evidenzia come il nuovo approccio abbia consentito di includere eventi sismici che in precedenza erano stati esclusi dal processo di selezione.
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 max_magnitudes <- terremoti %>%
   filter(type == "earthquake") %>%
